@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "TrustShield AI",
+    "description": "API testing collection for the TrustShield AI backend (FastAPI). Set the base_url variable to wherever your backend is running — default http://localhost:8000.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/health"
+      }
+    },
+    {
+      "name": "Analyze - Fake KYC + OTP (expect High/Critical)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/analyze",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Dear Customer, your SBI account KYC is pending and will be blocked today. Share the OTP sent to your number immediately to verify: http://sbi-kyc-verify.xyz/update\",\n  \"language\": \"auto\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Analyze - Fake job offer (expect Medium/High)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/analyze",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Congratulations! You are selected for a work from home job, earn Rs 4500 daily. Pay a small registration fee of Rs 499 via UPI to confirm your seat today only.\",\n  \"language\": \"auto\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Analyze - Normal appointment reminder (expect Low)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/analyze",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Hi Priya, this is a reminder for your dentist appointment tomorrow at 4:30 PM. Reply YES to confirm.\",\n  \"language\": \"auto\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Analyze - Tanglish message",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/analyze",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Unga bank account-la problem irukku, OTP sollunga urgent-a verify pannunga illa account block aagum\",\n  \"language\": \"auto\"\n}"
+        }
+      }
+    },
+    {
+      "name": "URL Check - lookalike phishing domain",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/url-check",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"http://paytm-kyc-verify.xyz/login\"\n}"
+        }
+      }
+    },
+    {
+      "name": "URL Check - plain legitimate-looking URL",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/url-check",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://www.wikipedia.org/wiki/Phishing\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Dashboard stats",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/dashboard"
+      }
+    }
+  ]
+}

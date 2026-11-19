@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: #050810;
+  color: #E6EDF7;
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+}
+
+/* Thin, muted scrollbar that still fits the dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #050810;
+}
+::-webkit-scrollbar-thumb {
+  background: #1C2A45;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #26395c;
+}
+
+/* Visible keyboard focus everywhere, including inside glass cards */
+:focus-visible {
+  outline: 2px solid #22D3EE;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.font-display {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+/* ---------- Glassmorphism ---------- */
+.glass-card {
+  background: linear-gradient(180deg, rgba(17, 26, 46, 0.72) 0%, rgba(11, 17, 32, 0.78) 100%);
+  border: 1px solid rgba(94, 150, 255, 0.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 50px -24px rgba(0, 0, 0, 0.6);
+}
+
+.glass-border-glow {
+  position: relative;
+}
+.glass-border-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.45), rgba(139, 92, 246, 0.25) 45%, rgba(34, 211, 238, 0) 75%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ---------- Background grid + vignette ---------- */
+.cyber-grid-bg {
+  background-image:
+    linear-gradient(rgba(94, 150, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 150, 255, 0.07) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+/* ---------- 3D shield hero ---------- */
+.shield-stage {
+  perspective: 1200px;
+}
+.shield-3d {
+  transform-style: preserve-3d;
+  animation: shield-float 7s ease-in-out infinite;
+}
+@keyframes shield-float {
+  0%, 100% { transform: rotateY(-18deg) rotateX(6deg) translateY(0px); }
+  50% { transform: rotateY(-8deg) rotateX(2deg) translateY(-10px); }
+}
+.shield-layer-back {
+  transform: translateZ(-30px);
+}
+.shield-layer-mid {
+  transform: translateZ(0px);
+}
+.shield-layer-front {
+  transform: translateZ(34px);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.85); opacity: 0.65; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.pulse-ring {
+  animation: pulse-ring 2.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.glow-breathe {
+  animation: glow-breathe 3.2s ease-in-out infinite;
+}
+
+/* ---------- Respect reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .shield-3d,
+  .pulse-ring,
+  .glow-breathe,
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
