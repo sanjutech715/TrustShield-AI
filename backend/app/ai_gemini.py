@@ -7,7 +7,7 @@ Design intent (please read before wiring this into a real deployment):
     when configured, is only used to produce a more natural-language
     explanation layer on top of the signals the rule engine already
     found — it does not get to silently override the score.
-  * If GEMINI_API_KEY is not set, or the `google-generativeai` package
+  * If GEMINI_API_KEY is not set, or the `google-genai` package
     is not installed, or the call fails for any reason, this module
     returns None and the caller falls back to the rule-based engine
     with `analyzer_used: "rule_based"`. The API NEVER claims
@@ -19,15 +19,20 @@ Design intent (please read before wiring this into a real deployment):
 from __future__ import annotations
 
 import json
+import logging
 import os
 from typing import Optional
 
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import errors, types
 
     _GENAI_AVAILABLE = True
 except ImportError:  # package not installed — perfectly fine, we degrade gracefully
     _GENAI_AVAILABLE = False
+
+_LOGGER = logging.getLogger(__name__)
+_MODEL_NAME = "gemini-3.5-flash-lite"
 
 _SYSTEM_PROMPT = """You are a cybersecurity literacy assistant for TrustShield AI, \
 a prototype scam-message analyzer used in India. You will be given a message and a \
@@ -48,11 +53,7 @@ def generate_explanation(message: str, signals: list[dict], language: str) -> Op
         return None
 
     try:
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            system_instruction=_SYSTEM_PROMPT,
-        )
+        client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
         user_payload = json.dumps(
             {
                 "message_preview": message[:500],
@@ -61,14 +62,27 @@ def generate_explanation(message: str, signals: list[dict], language: str) -> Op
             },
             ensure_ascii=False,
         )
-        response = model.generate_content(user_payload)
+        response = client.models.generate_content(
+            model=_MODEL_NAME,
+            contents=user_payload,
+            config=types.GenerateContentConfig(
+                system_instruction=_SYSTEM_PROMPT,
+                response_mime_type="application/json",
+            ),
+        )
         raw = (response.text or "").strip()
-        raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        raw = (
+            raw.removeprefix("```json")
+            .removeprefix("```")
+            .removesuffix("```")
+            .strip()
+        )
         parsed = json.loads(raw)
         explanation = parsed.get("explanation")
         return explanation if isinstance(explanation, str) and explanation.strip() else None
-    except Exception:
-        # Any failure (network, auth, quota, malformed response, missing
-        # package at runtime, etc.) silently falls back — the rule-based
-        # result is still complete and usable on its own.
+    except (errors.APIError, json.JSONDecodeError) as exc:
+        _LOGGER.warning(
+            "Gemini explanation failed; using the rule-based explanation: %s",
+            exc,
+        )
         return None

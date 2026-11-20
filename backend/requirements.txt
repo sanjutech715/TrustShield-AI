@@ -7,4 +7,4 @@ httpx==0.27.2
 # Optional — only needed if you set GEMINI_API_KEY and want the live AI
 # commentary layer described in app/ai_gemini.py. The app runs fully
 # without this package installed; it falls back to the rule-based engine.
-google-generativeai==0.8.3
+google-genai==3.6.1

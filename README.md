@@ -127,16 +127,16 @@ you want Gemini to rewrite the plain-language explanation on top of
 the signals the rule engine already found:
 
 ```bash
-pip install google-generativeai   # already in requirements.txt
+pip install google-genai           # already pinned in backend/requirements.txt
 # in backend/.env:
 GEMINI_API_KEY=your_key_here
 ```
 
-With no key set, `/api/health` reports `ai_configured: false` and
-every analysis response is honestly labelled `analyzer_used:
-"rule_based"`. The app **never claims an AI layer ran when it
-didn't** — this was a hard requirement of the brief and is enforced in
-`backend/app/ai_gemini.py`.
+`/api/health` reports whether the Gemini SDK and key are configured; it
+does not test the key or network connection. An analysis response uses
+`analyzer_used: "gemini"` only when a live Gemini call succeeds, otherwise
+the rule-based engine remains authoritative. Gemini request failures are
+logged by the backend.
 
 ### 4. API testing with Postman
 

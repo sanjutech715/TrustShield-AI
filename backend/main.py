@@ -56,10 +56,10 @@ def health() -> dict:
         "status": "ok",
         "ai_configured": ai_gemini.is_configured(),
         "note": (
-            "ai_configured=false means every response comes from the "
-            "rule-based engine only (analyzer_used: 'rule_based'). "
-            "This endpoint never reports an AI layer as active unless a "
-            "live Gemini call would actually run."
+            "ai_configured indicates that the Gemini package and API key "
+            "are present; it does not verify connectivity or key validity. "
+            "An analysis reports analyzer_used='gemini' only after a live "
+            "Gemini call succeeds; otherwise it uses the rule-based engine."
         ),
     }
 
